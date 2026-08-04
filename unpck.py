@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import base64
+import argparse
 
 
 def parse_entry(entry):
@@ -29,11 +30,26 @@ def parse_entry(entry):
 
 
 def unpack_project():
+    parser = argparse.ArgumentParser(
+        description="Unpack a JSON-formatted project structure from stdin."
+    )
+    parser.add_argument(
+        "target_dir",
+        nargs="?",
+        default=".",
+        help="Target directory to unpack into (default: current directory)"
+    )
+    parser.add_argument(
+        "-f", "--force",
+        action="store_true",
+        help="Force overwrite of existing files"
+    )
 
-    force = any(arg.lower() in ("-f", "--force") for arg in sys.argv[1:])
+    args = parser.parse_args()
+    target_dir = args.target_dir
+    force = args.force
 
     try:
-
         input_data = sys.stdin.read()
 
         if not input_data.strip():
@@ -45,6 +61,11 @@ def unpack_project():
         if not isinstance(files_to_create, list):
             print("Error: Expected a JSON array at root.", file=sys.stderr)
             sys.exit(1)
+
+        # Create target directory structure if it doesn't exist
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir, exist_ok=True)
+            print(f"Created target directory: {target_dir}")
 
         #
         # Pass 1 - validate entries and look for files that already exist
@@ -64,7 +85,7 @@ def unpack_project():
             if contents is None:
                 continue
 
-            normalized = path.replace("\\", "/")
+            normalized = os.path.join(target_dir, path.replace("\\", "/"))
 
             if os.path.exists(normalized):
                 overwrite_list.append(normalized)
@@ -102,7 +123,7 @@ def unpack_project():
             if not path:
                 continue
 
-            write_entry(path, content, encoding)
+            write_entry(target_dir, path, content, encoding)
 
         print("\nSuccessfully unpacked all project files.")
 
@@ -115,9 +136,9 @@ def unpack_project():
         sys.exit(1)
 
 
-def write_entry(relative_path, contents, encoding="text"):
+def write_entry(target_dir, relative_path, contents, encoding="text"):
 
-    normalized_path = relative_path.replace("\\", "/")
+    normalized_path = os.path.join(target_dir, relative_path.replace("\\", "/"))
 
     #
     # Directory

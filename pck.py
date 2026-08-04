@@ -112,9 +112,17 @@ def main():
 
     project_dir = args.directory
 
+    # Verify that the starting directory exists
     if not os.path.exists(project_dir):
         print(
-            f"Error: The directory '{project_dir}' does not exist.",
+            f"Error: Target directory '{project_dir}' does not exist.",
+            file=sys.stderr
+        )
+        sys.exit(1)
+
+    if not os.path.isdir(project_dir):
+        print(
+            f"Error: Target path '{project_dir}' is not a directory.",
             file=sys.stderr
         )
         sys.exit(1)
@@ -123,6 +131,13 @@ def main():
         project_dir,
         os.getcwd()
     )
+
+    # Check if the directory resulted in any packed content
+    if not file_data:
+        print(
+            f"Warning: Directory '{project_dir}' is empty or contains no packable files.",
+            file=sys.stderr
+        )
 
     print(json.dumps(file_data, indent=2))
 
