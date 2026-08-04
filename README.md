@@ -59,7 +59,7 @@ Directories are identified by a trailing `/`.  Note that defining directories in
 
 ## Usage
 
-### Basic directory creation from a JSON using  JSON array of objects .pck file
+### Basic directory creation from a JSON file using JSON array of objects .pck file
 
 ```bash
 Simple form:
