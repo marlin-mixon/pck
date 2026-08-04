@@ -1,10 +1,10 @@
-# path-content-json
+# pck
 
-A simple pair of Python utilities that 1. Encodes a project directory into a single JSON document.  2. Constructs or Reconstructs a project based on the JSON array describing the files and directories.
+A simple pair of Python utilities that 1. Packs a project directory into a single uncompressed JSON document.  2. Unpacks or reconstructs a project based on the JSON array describing the files and directories.
 
 This tool makes it quick and easy to pass context to and from LLMs.  It is designed for AI-assisted development workflows where an LLM generates an entire project as structured JSON. The json_to_directory utility reads the JSON from **stdin** and recreates the corresponding directory structure and files on disk.  The directory_to_json reverses the process.  It creates a JSON file based on the contents of the starting directory and dives into the directory structure finding all files and stores them in a single JSON file.
 
-## json_to_directory Features
+## pck command Features
 
 - Creates directories and files from a JSON document
 - Automatically creates parent directories as needed
@@ -15,19 +15,17 @@ This tool makes it quick and easy to pass context to and from LLMs.  It is desig
 - Supports `-f`, or `--force` options to force overwriting existing files
 - Simple, dependency-free implementation using the Python standard library
 
-## directory_to_json Features
+## unpck command Features
 
 - Creates two types of JSON files based on a directory structure.
 - Default format type 1 is JSON array of objects.  This is easiest for humans to read and easily handled by LLMs
-- Option format type 2 is JSON array only.  This is still easy for LLMs to read but a bit harder for people.  Its advantage is it is minimal and conserves tokens.
-- Both of these JSON formats are simple arrays and are only a single level deep.  Directory structure and depth is implied by the path elements.
-- Supports `-m`, or `--minimize` options to create file that is minimally sized for best LLM token usage.
+- This JSON format is a simple array and is only a single level deep.  Directory structure and depth is implied by the path elements.
 - writes to JSON to STDOUT.  Redirect as needed
 
 
 ## JSON Format
 
-Example of JSON object format -- an array of JSON objects:
+Example of pck's JSON object format -- an array of JSON objects:
 
 Each element contains:
 
@@ -56,33 +54,15 @@ Each element contains:
 ]
 ```
 
-Example of minimized JSON array-only format:
-
-```json
-[
-["README.md","# My Project\n"],
-["src/",null],
-["src/main.py","print('Hello, world!')\n"],
-["assets/image.png", "base64", "iVBORw0KGgoAAAANSUhEUgAA..."]
-]
-```
 Directories are identified by a trailing `/`.  Note that defining directories in this way is optional and only required for creating empty directories.
 
-Use this to preface the minimized JSON array format to provide guidance for the LLM:
-```
-Project format:
-["path","text"] = UTF-8 file
-["path","base64","data"] = binary file
-["dir/",null] = directory
-Root is an array of entries.
-```
 
 ## Usage
 
-### Basic directory creation from a JSON using either JSON array of object format or JSON mimimzed array format
+### Basic directory creation from a JSON using  JSON array of objects .pck file
 
 ```bash
-python json_to_directory.py < project.json
+unpck < project.pck
 ```
 
 If existing files are found, the utility will stop before writing anything and display a list of conflicts.
@@ -104,7 +84,7 @@ Run again with -f to overwrite these files.
 ### As above but with force overwrite
 
 ```bash
-python json_to_directory.py -f < project.json
+unpck -f < project.pck
 
 (use switches -f, --force as desired)
 ```
@@ -112,15 +92,11 @@ python json_to_directory.py -f < project.json
 ### Basic JSON creation from a directory structure
 
 ```bash
-python directory_to_json.py > project.json
-```
+Simplest form:
+pck > project.pck
 
-### Minimally-sized JSON format creation from a directory structure
-
-```bash
-python directory_to_json.py -m > MinProject.json
-
-(use switches -m, --minimize as desired)
+Provide optional starting directory:
+pck sub1/sub2 > project2.pck
 ```
 
 ## Why this exists
@@ -135,7 +111,7 @@ Large Language Models often require full directory context in order to assist yo
 ## Installation
 
 ```bash
-pip install git+[https://github.com/marlin-mixon/path-content-json.git](https://github.com/marlin-mixon/path-content-json.git)
+pip install git+[https://github.com/marlin-mixon/pck.git](https://github.com/marlin-mixon/pck.git)
 ```
 
 ## License
