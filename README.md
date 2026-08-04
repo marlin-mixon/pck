@@ -62,7 +62,11 @@ Directories are identified by a trailing `/`.  Note that defining directories in
 ### Basic directory creation from a JSON using  JSON array of objects .pck file
 
 ```bash
+Simple form:
 unpck < project.pck
+
+Provide optional subdirectory to unpack into.  If directory does not exist the path will be created:
+unpck sub1/sub2 < project.pck
 ```
 
 If existing files are found, the utility will stop before writing anything and display a list of conflicts.
@@ -92,7 +96,7 @@ unpck -f < project.pck
 ### Basic JSON creation from a directory structure
 
 ```bash
-Simplest form:
+Simple form:
 pck > project.pck
 
 Provide optional starting directory:
