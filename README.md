@@ -20,7 +20,7 @@ This tool makes it quick and easy to pass context to and from LLMs.  It is desig
 - Creates two types of JSON files based on a directory structure.
 - Default format type 1 is JSON array of objects.  This is easiest for humans to read and easily handled by LLMs
 - This JSON format is a simple array and is only a single level deep.  Directory structure and depth is implied by the path elements.
-- writes to JSON to STDOUT.  Redirect as needed
+- Writes JSON to STDOUT.  Redirect as needed
 
 
 ## JSON Format
