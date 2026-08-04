@@ -8,21 +8,14 @@ def parse_entry(entry):
     """
     Returns (path, content, encoding)
 
-    Supports both formats:
-
-    Object format:
+    Expected object format:
         {
             "path": "...",
             "content": "...",
             "encoding": "base64"
         }
 
-    Minimized format:
-        ["path", "content"]
-
-        ["path", "base64", "..."]
-
-        ["directory/", None]
+    "encoding" is optional and defaults to "text".
     """
 
     if isinstance(entry, dict):
@@ -31,14 +24,6 @@ def parse_entry(entry):
             entry.get("content"),
             (entry.get("encoding") or "text").strip().lower()
         )
-
-    if isinstance(entry, list):
-
-        if len(entry) == 2:
-            return entry[0], entry[1], "text"
-
-        if len(entry) == 3:
-            return entry[0], entry[2], entry[1].strip().lower()
 
     return None, None, None
 

@@ -5,7 +5,7 @@ import base64
 import argparse
 
 
-def scan_directory(target_dir, base_dir=None, minimize=False):
+def scan_directory(target_dir, base_dir=None):
     result = []
 
     ignored_dirs = {
@@ -32,13 +32,10 @@ def scan_directory(target_dir, base_dir=None, minimize=False):
                 + "/"
             )
 
-            if minimize:
-                result.append([dir_path])
-            else:
-                result.append({
-                    "path": dir_path,
-                    "content": None
-                })
+            result.append({
+                "path": dir_path,
+                "content": None
+            })
 
         # Record files
         for file in files:
@@ -73,22 +70,16 @@ def scan_directory(target_dir, base_dir=None, minimize=False):
                 if is_binary:
                     encoded = base64.b64encode(data).decode("ascii")
 
-                    if minimize:
-                        result.append([path, "b", encoded])
-                    else:
-                        result.append({
-                            "path": path,
-                            "encoding": "base64",
-                            "content": encoded
-                        })
+                    result.append({
+                        "path": path,
+                        "encoding": "base64",
+                        "content": encoded
+                    })
                 else:
-                    if minimize:
-                        result.append([path, text])
-                    else:
-                        result.append({
-                            "path": path,
-                            "content": text
-                        })
+                    result.append({
+                        "path": path,
+                        "content": text
+                    })
 
             except PermissionError:
                 print(
@@ -117,13 +108,6 @@ def main():
         help="Directory to scan (default: current directory)"
     )
 
-    parser.add_argument(
-        "-m",
-        "--minimize",
-        action="store_true",
-        help="Minimize JSON for LLM consumption."
-    )
-
     args = parser.parse_args()
 
     project_dir = args.directory
@@ -137,14 +121,10 @@ def main():
 
     file_data = scan_directory(
         project_dir,
-        os.getcwd(),
-        minimize=args.minimize
+        os.getcwd()
     )
 
-    if args.minimize:
-        print(json.dumps(file_data, separators=(",", ":")))
-    else:
-        print(json.dumps(file_data, indent=2))
+    print(json.dumps(file_data, indent=2))
 
 
 if __name__ == "__main__":

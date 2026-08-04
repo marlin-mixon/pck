@@ -115,7 +115,7 @@ Large Language Models often require full directory context in order to assist yo
 ## Installation
 
 ```bash
-pip install git+[https://github.com/marlin-mixon/pck.git](https://github.com/marlin-mixon/pck.git)
+pip install git+https://github.com/marlin-mixon/pck.git
 ```
 
 ## License
