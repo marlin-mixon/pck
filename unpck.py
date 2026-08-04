@@ -29,6 +29,15 @@ def parse_entry(entry):
     return None, None, None
 
 
+def get_target_path(target_dir, relative_path):
+    """
+    Normalizes slashes and safely joins target_dir with relative_path,
+    ensuring leading slashes do not break out of target_dir.
+    """
+    clean_rel = relative_path.replace("\\", "/").lstrip("/")
+    return os.path.join(target_dir, clean_rel)
+
+
 def unpack_project():
     parser = argparse.ArgumentParser(
         description="Unpack a JSON-formatted project structure from stdin."
@@ -68,7 +77,7 @@ def unpack_project():
             print(f"Created target directory: {target_dir}")
 
         #
-        # Pass 1 - validate entries and look for files that already exist
+        # Pass 1 - validate entries and look for files that already exist in target_dir
         #
 
         overwrite_list = []
@@ -85,10 +94,10 @@ def unpack_project():
             if contents is None:
                 continue
 
-            normalized = os.path.join(target_dir, path.replace("\\", "/"))
+            target_path = get_target_path(target_dir, path)
 
-            if os.path.exists(normalized):
-                overwrite_list.append(normalized)
+            if os.path.exists(target_path):
+                overwrite_list.append(target_path)
 
         if overwrite_list and not force:
 
@@ -138,7 +147,7 @@ def unpack_project():
 
 def write_entry(target_dir, relative_path, contents, encoding="text"):
 
-    normalized_path = os.path.join(target_dir, relative_path.replace("\\", "/"))
+    normalized_path = get_target_path(target_dir, relative_path)
 
     #
     # Directory
