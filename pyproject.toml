@@ -3,12 +3,30 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pck"
+name = "pck-utils"
 version = "0.1.0"
 description = "A simple pair of Python utilities that 1. Encodes a project directory into a single JSON document. 2. Constructs or Reconstructs a project based on the JSON array describing the files and directories."
 readme = "README.md"
 requires-python = ">=3.7"
+license = {file = "LICENSE"}
+authors = [
+    { name = "Marlin Mixon" }
+]
 dependencies = []
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://github.com/marlin-mixon/pck"
+Repository = "https://github.com/marlin-mixon/pck"
+Issues = "https://github.com/marlin-mixon/pck/issues"
 
 [tool.setuptools]
 py-modules = ["pck", "unpck"]
