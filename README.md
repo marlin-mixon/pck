@@ -116,6 +116,9 @@ Large Language Models often require full directory context in order to assist yo
 
 ```bash
 pip install git+https://github.com/marlin-mixon/pck.git
+
+To upgrade to latest version:
+pip install --no-cache-dir --force-reinstall git+https://github.com/marlin-mixon/pck.git
 ```
 
 ## License
