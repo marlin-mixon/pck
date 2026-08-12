@@ -62,6 +62,12 @@ Directories are identified by a trailing `/`.  Note that defining directories in
 ### Basic directory creation from a JSON file using JSON array of objects .pck file
 
 ```bash
+Simplest form:
+unpck
+```
+unpck will use whatever is in your clipboad or let you copy and then paste directly into unpck.
+
+```bash
 Simple form:
 unpck < project.pck
 
@@ -117,6 +123,14 @@ Large Language Models often require full directory context in order to assist yo
 ```bash
 pip install pck-utils
 ```
+
+## Version
+
+0.2.0, 12-Aug-2026
+
+## Release Notes
+
+Added an easy clipboard paste feature for unpck allowing you to go from copying to clibboard to pasting directly into unpck.
 
 ## License
 

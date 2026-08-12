@@ -3,34 +3,40 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pck-utils"
-version = "0.1.0"
+name = "pck"
+version = "0.2.0"
 description = "A simple pair of Python utilities that 1. Encodes a project directory into a single JSON document. 2. Constructs or Reconstructs a project based on the JSON array describing the files and directories."
 readme = "README.md"
 requires-python = ">=3.7"
-license = {file = "LICENSE"}
+license = {text = "MIT"}
 authors = [
-    { name = "Marlin Mixon" }
+    {name = "Your Name", email = "your.email@example.com"}
 ]
-dependencies = []
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: PyPy",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Environment :: Console",
-    "Topic :: Software Development :: Build Tools",
-    "Topic :: Utilities",
+]
+dependencies = [
+    "pyperclip>=1.8.0",
 ]
 
 [project.urls]
 Homepage = "https://github.com/marlin-mixon/pck"
-Repository = "https://github.com/marlin-mixon/pck"
+Repository = "https://github.com/marlin-mixon/pck.git"
 Issues = "https://github.com/marlin-mixon/pck/issues"
 
-[tool.setuptools]
-py-modules = ["pck", "unpck"]
-
 [project.scripts]
-pck = "pck:main"
-unpck = "unpck:unpack_project"
+pck = "pck.pack:pack_project"
+unpck = "pck.unpack:unpack_project"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["pck*"]
