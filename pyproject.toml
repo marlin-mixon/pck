@@ -3,14 +3,14 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pck"
+name = "pck-utils"
 version = "0.2.0"
 description = "A simple pair of Python utilities that 1. Encodes a project directory into a single JSON document. 2. Constructs or Reconstructs a project based on the JSON array describing the files and directories."
 readme = "README.md"
 requires-python = ">=3.7"
 license = {text = "MIT"}
 authors = [
-    {name = "Your Name", email = "your.email@example.com"}
+    {name = "Marlin Mixon"}
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -38,5 +38,5 @@ pck = "pck.pack:pack_project"
 unpck = "pck.unpack:unpack_project"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
 include = ["pck*"]
