@@ -4,14 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pck-utils"
-version = "0.2.0"
+version = "0.2.1"
 description = "A simple pair of Python utilities that 1. Encodes a project directory into a single JSON document. 2. Constructs or Reconstructs a project based on the JSON array describing the files and directories."
 readme = "README.md"
 requires-python = ">=3.7"
 license = {text = "MIT"}
+
 authors = [
     {name = "Marlin Mixon"}
 ]
+
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.7",
@@ -24,6 +26,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+
 dependencies = [
     "pyperclip>=1.8.0",
 ]
@@ -34,9 +37,8 @@ Repository = "https://github.com/marlin-mixon/pck.git"
 Issues = "https://github.com/marlin-mixon/pck/issues"
 
 [project.scripts]
-pck = "pck.pack:pack_project"
-unpck = "pck.unpack:unpack_project"
+pck = "pck:main"
+unpck = "unpck:unpack_project"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["pck*"]
+[tool.setuptools]
+py-modules = ["pck", "unpck"]

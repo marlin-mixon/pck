@@ -126,7 +126,7 @@ pip install pck-utils
 
 ## Version
 
-0.2.0, 12-Aug-2026
+0.2.1, 12-Aug-2026
 
 ## Release Notes
 
