@@ -3,6 +3,7 @@ import json
 import sys
 import base64
 import argparse
+import pyperclip
 
 
 def scan_directory(target_dir, base_dir=None):
@@ -108,6 +109,12 @@ def main():
         help="Directory to scan (default: current directory)"
     )
 
+    parser.add_argument(
+        "-c", "--clipboard",
+        action="store_true",
+        help="Copy output to clipboard instead of stdout"
+    )
+
     args = parser.parse_args()
 
     project_dir = args.directory
@@ -139,7 +146,17 @@ def main():
             file=sys.stderr
         )
 
-    print(json.dumps(file_data, indent=2))
+    json_output = json.dumps(file_data, indent=2)
+
+    if args.clipboard:
+        try:
+            pyperclip.copy(json_output)
+            print("Successfully copied JSON output to clipboard.", file=sys.stderr)
+        except pyperclip.PyperclipException:
+            print("Error: Could not access the clipboard. Ensure a clipboard mechanism (e.g., xclip/xsel on Linux) is installed.", file=sys.stderr)
+            sys.exit(1)
+    else:
+        print(json_output)
 
 
 if __name__ == "__main__":

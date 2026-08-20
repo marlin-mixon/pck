@@ -6,7 +6,14 @@ This tool makes it quick and easy to pass context to and from LLMs.  It is desig
 
 ## pck command Features
 
-- Creates directories and files from a JSON document
+- Creates a PCK-formatted JSON file based on a directory structure.
+- This JSON format is a simple array and is only a single level deep.  Directory structure and depth is implied by the path elements.
+- Writes JSON to STDOUT.  Redirect as needed
+- Supports a -c or --clipboard option to output the PCK file to the clipboard.
+
+## unpck command Features
+
+- Creates directories and files from a PCK-formatted JSON document
 - Automatically creates parent directories as needed
 - Uses UTF-8 encoding
 - Writes files with Unix (LF) line endings
@@ -14,14 +21,7 @@ This tool makes it quick and easy to pass context to and from LLMs.  It is desig
 - Lists all conflicting files before making any changes
 - Supports `-f`, or `--force` options to force overwriting existing files
 - Simple, dependency-free implementation using the Python standard library
-
-## unpck command Features
-
-- Creates two types of JSON files based on a directory structure.
-- Default format type 1 is JSON array of objects.  This is easiest for humans to read and easily handled by LLMs
-- This JSON format is a simple array and is only a single level deep.  Directory structure and depth is implied by the path elements.
-- Writes JSON to STDOUT.  Redirect as needed
-
+- If no input redirect is given, tries to pull in a PCK-formatted JSON file from the clipboard.
 
 ## JSON Format
 
@@ -46,11 +46,12 @@ Each element contains:
   {
     "path": "src/main.py",
     "content": "print('Hello, world!')\n"
-  }.
+  },
   {
     "path": "assets/image.png",
     "encoding": "base64",
     "content": "iVBORw0KGgoAAAANSUhEUgAA..."
+  }
 ]
 ```
 
