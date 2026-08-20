@@ -1,14 +1,10 @@
-import sys
-import os
-import json
-import base64
 import argparse
+import base64
+import json
+import os
+import sys
 
-try:
-    import pyperclip
-    HAVE_PYPERCLIP = True
-except ImportError:
-    HAVE_PYPERCLIP = False
+import pyperclip
 
 
 def parse_entry(entry):
@@ -24,14 +20,12 @@ def parse_entry(entry):
 
     "encoding" is optional and defaults to "text".
     """
-
     if isinstance(entry, dict):
         return (
             entry.get("path"),
             entry.get("content"),
-            (entry.get("encoding") or "text").strip().lower()
+            (entry.get("encoding") or "text").strip().lower(),
         )
-
     return None, None, None
 
 
@@ -45,38 +39,26 @@ def get_target_path(target_dir, relative_path):
 
 
 def write_entry(target_dir, relative_path, contents, encoding="text"):
-
     normalized_path = get_target_path(target_dir, relative_path)
 
-    #
     # Directory
-    #
     if contents is None:
-
         os.makedirs(normalized_path.rstrip("/"), exist_ok=True)
         print(f"Created directory: {normalized_path}")
         return
 
     directory = os.path.dirname(normalized_path)
-
     if directory:
         os.makedirs(directory, exist_ok=True)
 
     if encoding == "text":
-
         with open(
-            normalized_path,
-            "w",
-            encoding="utf-8",
-            newline="\n"
+            normalized_path, "w", encoding="utf-8", newline="\n"
         ) as f:
             f.write(contents)
-
     elif encoding == "base64":
-
         try:
             binary = base64.b64decode(contents)
-
         except Exception as ex:
             raise ValueError(
                 f"Invalid base64 content for '{normalized_path}': {ex}"
@@ -84,7 +66,6 @@ def write_entry(target_dir, relative_path, contents, encoding="text"):
 
         with open(normalized_path, "wb") as f:
             f.write(binary)
-
     else:
         raise ValueError(
             f"Unsupported encoding '{encoding}' for '{normalized_path}'"
@@ -98,7 +79,6 @@ def validate_payload(files_to_create):
     Confirms the parsed JSON is a list of dict entries with a usable
     'path' key. Returns (is_valid, error_message).
     """
-
     if not isinstance(files_to_create, list):
         return False, "Expected a JSON array at the root."
 
@@ -132,22 +112,48 @@ def summarize_payload(files_to_create):
     return file_paths, dir_paths
 
 
+def check_overwrites(files_to_create, target_dir, force):
+    """
+    Checks if any files will be overwritten. If so and force is False,
+    prints the list of existing files to stderr and exits with code 2.
+    """
+    overwrite_list = []
+
+    for file_info in files_to_create:
+        path, contents, _ = parse_entry(file_info)
+
+        if not path or contents is None:
+            continue
+
+        target_path = get_target_path(target_dir, path)
+        if os.path.exists(target_path):
+            overwrite_list.append(target_path)
+
+    if overwrite_list and not force:
+        print(
+            "The following files already exist and would be overwritten:\n",
+            file=sys.stderr,
+        )
+        for filename in overwrite_list:
+            print(f"  {filename}", file=sys.stderr)
+
+        print(
+            f"\n{len(overwrite_list)} file(s) would be overwritten.",
+            file=sys.stderr,
+        )
+        print(
+            "Run again with -f to force overwriting existing files.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+
+
 def read_json_from_clipboard():
     """
     Interactive loop: prompts the user to copy JSON to the clipboard,
     reads it on Enter, and validates it. Returns a parsed list, or
     None if the user quits.
     """
-
-    if not HAVE_PYPERCLIP:
-        print(
-            "Error: clipboard mode requires the 'pyperclip' package.\n"
-            "Install it with: pip install pyperclip\n"
-            "Or pipe input instead: unpck < yourfile.pck",
-            file=sys.stderr
-        )
-        sys.exit(1)
-
     print("pck-utils: waiting for JSON on your clipboard...\n")
     print("  1. Copy your .pck JSON (e.g. from an LLM response)")
     print("  2. Press Enter here to unpack it")
@@ -166,7 +172,7 @@ def read_json_from_clipboard():
             print(
                 f"Could not read clipboard: {ex}\n"
                 "Copy your JSON and press Enter to try again, or 'q' to quit.\n",
-                file=sys.stderr
+                file=sys.stderr,
             )
             continue
 
@@ -203,7 +209,6 @@ def confirm_unpack(files_to_create, target_dir):
     Shows a preview of what will be created and asks for confirmation.
     Returns True to proceed, False to abort.
     """
-
     file_paths, dir_paths = summarize_payload(files_to_create)
 
     total_dirs = len(dir_paths)
@@ -228,63 +233,16 @@ def do_unpack(files_to_create, target_dir, force):
     """
     Shared write logic used by both stdin and clipboard modes.
     """
-
     # Create target directory structure if it doesn't exist
     if not os.path.exists(target_dir):
         os.makedirs(target_dir, exist_ok=True)
         print(f"Created target directory: {target_dir}")
 
-    #
-    # Pass 1 - validate entries and look for files that already exist in target_dir
-    #
+    # Check overwrites (will exit(2) if files exist and force is False)
+    check_overwrites(files_to_create, target_dir, force)
 
-    overwrite_list = []
-
+    # Write everything
     for file_info in files_to_create:
-
-        path, contents, encoding = parse_entry(file_info)
-
-        if not path:
-            print("Warning: Invalid entry. Skipping.", file=sys.stderr)
-            continue
-
-        # Directories don't overwrite files
-        if contents is None:
-            continue
-
-        target_path = get_target_path(target_dir, path)
-
-        if os.path.exists(target_path):
-            overwrite_list.append(target_path)
-
-    if overwrite_list and not force:
-
-        print(
-            "The following files already exist and would be overwritten:\n",
-            file=sys.stderr
-        )
-
-        for filename in overwrite_list:
-            print(f"  {filename}", file=sys.stderr)
-
-        print(
-            f"\n{len(overwrite_list)} file(s) would be overwritten.",
-            file=sys.stderr
-        )
-
-        print(
-            "Run again with -f to force overwriting existing files.",
-            file=sys.stderr
-        )
-
-        sys.exit(2)
-
-    #
-    # Pass 2 - write everything
-    #
-
-    for file_info in files_to_create:
-
         path, content, encoding = parse_entry(file_info)
 
         if not path:
@@ -298,28 +256,31 @@ def do_unpack(files_to_create, target_dir, force):
 def unpack_project():
     parser = argparse.ArgumentParser(
         description="Unpack a JSON-formatted project structure from stdin "
-                     "or your clipboard."
+        "or your clipboard."
     )
     parser.add_argument(
         "target_dir",
         nargs="?",
         default=".",
-        help="Target directory to unpack into (default: current directory)"
+        help="Target directory to unpack into (default: current directory)",
     )
     parser.add_argument(
-        "-f", "--force",
+        "-f",
+        "--force",
         action="store_true",
-        help="Force overwrite of existing files"
+        help="Force overwrite of existing files",
     )
     parser.add_argument(
-        "-c", "--clipboard",
+        "-c",
+        "--clipboard",
         action="store_true",
-        help="Read JSON from the clipboard interactively, even if stdin is piped"
+        help="Read JSON from the clipboard interactively, even if stdin is piped",
     )
     parser.add_argument(
-        "-y", "--yes",
+        "-y",
+        "--yes",
         action="store_true",
-        help="Skip the confirmation prompt in clipboard mode"
+        help="Skip the confirmation prompt in clipboard mode",
     )
 
     args = parser.parse_args()
@@ -334,6 +295,9 @@ def unpack_project():
 
             if files_to_create is None:
                 sys.exit(0)
+
+            # Check for existing files BEFORE confirming
+            check_overwrites(files_to_create, target_dir, force)
 
             if not args.yes:
                 if not confirm_unpack(files_to_create, target_dir):

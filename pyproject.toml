@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pck-utils"
-version = "0.3.0"
+version = "0.3.1"
 description = "A simple pair of Python utilities that 1. Encodes a project directory into a single JSON document. 2. Constructs or Reconstructs a project based on the JSON array describing the files and directories."
 readme = "README.md"
 requires-python = ">=3.7"
